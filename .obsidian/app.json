@@ -1,0 +1,10 @@
+{
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "root",
+  "useMarkdownLinks": false,
+  "userIgnoreFilters": [
+    "code/",
+    ".git/",
+    "_atlas/audit/"
+  ]
+}

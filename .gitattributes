@@ -1,0 +1,7 @@
+# Line endings: these files are LF everywhere, so hashes, hooks and scripts behave the same on every OS.
+*.md text eol=lf
+*.py text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+code/git-hooks/pre-commit text eol=lf

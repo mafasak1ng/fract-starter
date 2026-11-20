@@ -1,0 +1,82 @@
+#!/bin/sh
+# FRACT layer guard: the pre-commit hook.
+#
+# Refuses a commit that changes a kernel path without the unlock (a trigger word
+# in ATLAS_TRIGGER and the owner's passkey in ATLAS_PASSKEY), and any change to a
+# provenance path. Policy: _atlas/layers.json. Decision logic: layer-guard.mjs.
+# Installed by code/setup/init_vault.py (git config core.hooksPath code/git-hooks).
+#
+# This launcher asks Git for everything the guard needs (the staged paths, the
+# committed and staged policy) and hands it to Node as files, so the guard never
+# runs Git itself and works with any Node on PATH, including a Windows node.exe
+# called from WSL. The guard code and the policy are both taken from the last
+# commit (HEAD) when it has them, so an uncommitted edit cannot weaken the check
+# it is judged by. Only the very first commits fall back to the staged files.
+#
+# Limits: `git commit --no-verify`, or changing core.hooksPath, skips any hook.
+# The guard stops accidents and agents that respect the repository; it is not a
+# sandbox.
+
+NODE="${ATLAS_NODE:-}"
+if [ -z "$NODE" ]; then
+  if command -v node >/dev/null 2>&1; then
+    NODE=node
+  elif command -v node.exe >/dev/null 2>&1; then
+    NODE=node.exe
+  fi
+fi
+if [ -z "$NODE" ]; then
+  echo "layer-guard: no Node.js found, so the layer policy cannot be checked. Commit refused." >&2
+  echo "Install Node.js 18 or newer, or set ATLAS_NODE to a node executable." >&2
+  exit 1
+fi
+
+ROOT=$(git rev-parse --show-toplevel) || exit 1
+cd "$ROOT" || exit 1
+GIT_DIR_ABS=$(cd "$(git rev-parse --git-dir)" && pwd) || exit 1
+WORK="$GIT_DIR_ABS/layer-guard.$$"
+rm -rf "$WORK"
+mkdir -p "$WORK" || exit 1
+trap 'rm -rf "$WORK"' EXIT HUP INT TERM
+
+# A Windows node.exe started from WSL sees only the variables WSLENV lists.
+case "$NODE" in
+  *.exe|*.EXE)
+    WSLENV="${WSLENV:+$WSLENV:}ATLAS_TRIGGER:ATLAS_PASSKEY"
+    export WSLENV
+    ;;
+esac
+
+# A Windows node.exe needs Windows paths.
+node_path() {
+  case "$NODE" in
+    *.exe|*.EXE)
+      if command -v wslpath >/dev/null 2>&1; then
+        wslpath -w "$1"
+        return
+      fi
+      ;;
+  esac
+  printf '%s' "$1"
+}
+
+git diff --cached --name-only --no-renames -z > "$WORK/staged" || exit 1
+if git rev-parse --verify -q HEAD >/dev/null 2>&1; then
+  : > "$WORK/has-head"
+  git show HEAD:_atlas/layers.json > "$WORK/head-policy.json" 2>/dev/null || rm -f "$WORK/head-policy.json"
+fi
+git show :_atlas/layers.json > "$WORK/index-policy.json" 2>/dev/null || rm -f "$WORK/index-policy.json"
+if ! git show HEAD:code/git-hooks/layer-guard.mjs > "$WORK/layer-guard.mjs" 2>/dev/null; then
+  if [ -f "$WORK/has-head" ] && git cat-file -e HEAD:code/git-hooks 2>/dev/null; then
+    echo "layer-guard: the last commit has code/git-hooks but no layer-guard.mjs. Commit refused." >&2
+    exit 1
+  fi
+  if ! git show :code/git-hooks/layer-guard.mjs > "$WORK/layer-guard.mjs" 2>/dev/null; then
+    cp code/git-hooks/layer-guard.mjs "$WORK/layer-guard.mjs" 2>/dev/null || {
+      echo "layer-guard: code/git-hooks/layer-guard.mjs is missing. Commit refused." >&2
+      exit 1
+    }
+  fi
+fi
+
+"$NODE" "$(node_path "$WORK/layer-guard.mjs")" "$(node_path "$WORK")" "$(node_path "$ROOT")"

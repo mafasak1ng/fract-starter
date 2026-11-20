@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "projects": [],
+  "note": "Linked project vaults of this vault. code/setup/new_project.py adds a row when it creates a project vault; check one with code/setup/new_project.py check <id>."
+}

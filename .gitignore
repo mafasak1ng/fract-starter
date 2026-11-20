@@ -1,0 +1,10 @@
+# Obsidian per-device state
+.obsidian/workspace*.json
+.trash/
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Layer guard audit log (local record of every kernel decision)
+_atlas/audit/

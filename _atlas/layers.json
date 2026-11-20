@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "default": "docs",
+  "note": "The vault's layer policy. Every path belongs to exactly one layer; the most specific pattern wins, so a narrow rule can carve an exception out of a broad one. This file is itself kernel: it changes only with a trigger word and the owner's passkey. Run code/setup/init_vault.py to set the passkey.",
+  "layers": {
+    "kernel": {
+      "label": "Layer 1 - the kernel: the rules every agent and person works under",
+      "order": 1,
+      "writable": "kernel",
+      "paths": [
+        "AGENTS.md",
+        "README.md",
+        ".gitattributes",
+        "_atlas/layers.json",
+        "code/git-hooks/**"
+      ]
+    },
+    "docs": {
+      "label": "Layer 2 - documentation: the notes, written with the owner's permission",
+      "order": 2,
+      "writable": "permission",
+      "paths": []
+    },
+    "ops": {
+      "label": "Layer 3 - operations: agent skills, code and tooling",
+      "order": 3,
+      "writable": "open",
+      "paths": [
+        ".agents/**",
+        "code/**",
+        "_atlas/**"
+      ]
+    },
+    "provenance": {
+      "label": "Provenance - never written, by anyone",
+      "order": 0,
+      "writable": "never",
+      "paths": []
+    }
+  },
+  "kernel": {
+    "triggers": [
+      "KERNEL-UNLOCK"
+    ],
+    "passkey": null
+  }
+}
