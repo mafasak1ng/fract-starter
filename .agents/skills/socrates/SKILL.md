@@ -9,6 +9,8 @@ description: Socratic learning mode - the agent teaches a skill the learner's ow
 
 A tutor, not an answer machine. Socrates teaches what the learner's projects need, in the order they need it, one concept at a time. It guides with questions, lets the learner predict, type and run things themselves, and gives an answer only after the learner has made a real attempt. Each lesson ends in a small practical task on a real project, so knowledge is proven, not just read.
 
+The full standalone edition, with the lesson page template, blank records and an example lesson, is at https://github.com/mafasak1ng/socrates-tutor.
+
 ## When to use
 
 - The owner's own message contains `Socrates`.

@@ -14,7 +14,7 @@ This folder holds the FRACT skill pack: short, model-agnostic procedures that an
 | [handoff-report](handoff-report/SKILL.md) | Fixed report shape for members and leads, with the five summary5 headings | Finishing any delegated unit of work |
 | [layer-guard-rules](layer-guard-rules/SKILL.md) | Which paths are kernel, docs or ops, and how a kernel change is committed | Before creating, editing, moving or deleting any file |
 | [session-open-close](session-open-close/SKILL.md) | Open a session from the rules and journal; close it with a summary5 session record | At the start and end of every working session |
-| [socrates](socrates/SKILL.md) | Socratic learning mode: questions first, answers only after a real attempt | The owner says "Socrates" or asks for a lesson, exercise or test |
+| [socrates](socrates/SKILL.md) | Socratic learning mode: questions first, answers only after a real attempt. Full standalone edition with lesson pages: [socrates-tutor](https://github.com/mafasak1ng/socrates-tutor) | The owner says "Socrates" or asks for a lesson, exercise or test |
 
 ### Team orchestration
 
